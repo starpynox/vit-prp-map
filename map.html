@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PRP Maps</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    #map-container {
+      width: 100%;
+      max-width: 500px;
+      margin: 20px auto;
+      background: #fff;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      padding: 10px;
+    }
+
+    #map {
+      width: 100%;
+      height: auto;
+    }
+
+    select {
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 20px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+  <h2>Select a Floor</h2>
+  <select id="floorSelect">
+    <option value="G">Ground Floor</option>
+    <option value="1">Floor 1</option>
+    <option value="2">Floor 2</option>
+    <option value="3">Floor 3</option>
+    <option value="4">Floor 4</option>
+    <option value="5">Floor 5</option>
+    <option value="6">Floor 6</option>
+    <option value="7">Floor 7</option>
+  </select>
+
+  <div id="map-container">
+    <img id="map" src="maps/floor-G.svg" alt="PRP Floor Map" />
+  </div>
+
+  <script>
+    const floorSelect = document.getElementById("floorSelect");
+    const mapImage = document.getElementById("map");
+
+    floorSelect.addEventListener("change", function () {
+      const selected = floorSelect.value;
+      mapImage.src = `maps/floor-${selected}.svg`;
+    });
+  </script>
+</body>
+</html>
