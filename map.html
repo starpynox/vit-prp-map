@@ -2,100 +2,152 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PRP Maps</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/svg-pan-zoom/3.6.1/svg-pan-zoom.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VIT PRP Map Viewer</title>
+  <link rel="stylesheet" href="style.css">
   <style>
-    #svg-pan-zoom-container {
-      width: 100%;
-      max-width: 90vw;
-      height: 80vh;
-      margin: 20px auto;
-      border: 2px solid #ccc;
-      border-radius: 10px;
-      background: #1e1e1e;
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f4f4f4;
     }
 
-    #map {
+    header {
+      background-color: #1e1e1e;
+      color: white;
+      padding: 1rem;
+    }
+
+    #controls {
+      margin: 1rem;
+    }
+
+    #map-container {
+      width: 100%;
+      height: 80vh;
+      overflow: hidden;
+      border: 2px solid #ccc;
+      background: white;
+      position: relative;
+    }
+
+    #map-container svg {
       width: 100%;
       height: 100%;
-      border: none;
+      transform-origin: center center;
+      transition: transform 0.1s ease;
+      cursor: grab;
     }
 
     select {
-      padding: 10px;
-      font-size: 16px;
-      margin-bottom: 20px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
+      font-size: 1rem;
+      padding: 0.5rem;
     }
 
-    h2 {
-      color: white;
-      text-align: center;
-    }
-
-    body {
-      background-color: #121212;
-      color: white;
-      font-family: Arial, sans-serif;
-      text-align: center;
+    button {
+      padding: 0.5rem 1rem;
+      margin: 0.25rem;
     }
   </style>
 </head>
 <body>
-  <a href="index.html" style="margin: 20px; padding: 10px 20px; font-size: 16px; display: inline-block; text-decoration: none; background: #444; color: white; border-radius: 6px;">&larr; Back</a>
 
-  <h2>Select a Floor</h2>
-  <select id="floorSelect">
-    <option value="G">Ground Floor</option>
-    <option value="1">Floor 1</option>
-    <option value="2">Floor 2</option>
-    <option value="3">Floor 3</option>
-    <option value="4">Floor 4</option>
-    <option value="5">Floor 5</option>
-    <option value="6">Floor 6</option>
-    <option value="7">Floor 7</option>
-  </select>
+  <header>
+    <h1>VIT PRP Interactive Map</h1>
+  </header>
 
-  <div id="svg-pan-zoom-container">
-    <object id="map" type="image/svg+xml" data="maps/floor-G.svg"></object>
+  <div id="controls">
+    <label for="floorSelect">Select Floor: </label>
+    <select id="floorSelect">
+      <option value="floor-G.svg">Ground Floor</option>
+      <option value="floor-1.svg">Floor 1</option>
+      <option value="floor-2.svg">Floor 2</option>
+      <option value="floor-3.svg">Floor 3</option>
+      <option value="floor-4.svg">Floor 4</option>
+      <option value="floor-5.svg">Floor 5</option>
+      <option value="floor-6.svg">Floor 6</option>
+      <option value="floor-7.svg">Floor 7</option>
+    </select>
+    <div>
+      <button onclick="zoomIn()">Zoom In</button>
+      <button onclick="zoomOut()">Zoom Out</button>
+      <button onclick="resetZoom()">Reset</button>
+    </div>
+  </div>
+
+  <div id="map-container">
+    <object id="svgObject" type="image/svg+xml" data="floor-G.svg"></object>
   </div>
 
   <script>
-    const floorSelect = document.getElementById("floorSelect");
-    const mapObject = document.getElementById("map");
-    let panZoomInstance = null;
+    const svgObject = document.getElementById('svgObject');
+    const floorSelect = document.getElementById('floorSelect');
 
-    function setupPanZoom() {
-      const svg = mapObject.contentDocument?.querySelector("svg");
-      if (!svg) return;
+    let scale = 1;
+    let panX = 0;
+    let panY = 0;
+    let isPanning = false;
+    let startX, startY;
 
-      panZoomInstance = svgPanZoom(svg, {
-        zoomEnabled: true,
-        controlIconsEnabled: true,
-        fit: true,
-        center: true,
-        minZoom: 0.5,
-        maxZoom: 10
-      });
+    floorSelect.addEventListener('change', () => {
+      svgObject.setAttribute('data', floorSelect.value);
+      resetZoom();
+    });
+
+    function zoomIn() {
+      scale *= 1.2;
+      updateTransform();
     }
 
-    mapObject.addEventListener("load", () => {
-      setupPanZoom();
-    });
+    function zoomOut() {
+      scale /= 1.2;
+      updateTransform();
+    }
 
-    floorSelect.addEventListener("change", () => {
-      const selected = floorSelect.value;
-      if (panZoomInstance) {
-        panZoomInstance.destroy();
-        panZoomInstance = null;
+    function resetZoom() {
+      scale = 1;
+      panX = 0;
+      panY = 0;
+      updateTransform();
+    }
+
+    function updateTransform() {
+      const svg = svgObject.contentDocument?.querySelector('svg');
+      if (svg) {
+        svg.style.transform = `scale(${scale}) translate(${panX}px, ${panY}px)`;
       }
+    }
 
-      // Update SVG and wait for it to load before setting up panZoom again
-      mapObject.data = `maps/floor-${selected}.svg`;
+    svgObject.addEventListener('load', () => {
+      const svg = svgObject.contentDocument.querySelector('svg');
+      if (svg) {
+        svg.style.transformOrigin = "center center";
+        svg.style.transform = "scale(1)";
+        svg.style.cursor = "grab";
+
+        svg.addEventListener('mousedown', (e) => {
+          isPanning = true;
+          startX = e.clientX;
+          startY = e.clientY;
+        });
+
+        svg.addEventListener('mousemove', (e) => {
+          if (!isPanning) return;
+          const dx = (e.clientX - startX) / scale;
+          const dy = (e.clientY - startY) / scale;
+          panX += dx;
+          panY += dy;
+          startX = e.clientX;
+          startY = e.clientY;
+          updateTransform();
+        });
+
+        svg.addEventListener('mouseup', () => isPanning = false);
+        svg.addEventListener('mouseleave', () => isPanning = false);
+      }
     });
   </script>
+
 </body>
 </html>
