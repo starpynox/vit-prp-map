@@ -6,6 +6,31 @@
   <title>PRP Maps</title>
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/svg-pan-zoom/3.6.1/svg-pan-zoom.min.js"></script>
+  <style>
+    #svg-pan-zoom-container {
+      width: 100%;
+      max-width: 90vw;
+      height: 80vh;
+      margin: 20px auto;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      background: #1e1e1e;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    select {
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 20px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+  </style>
 </head>
 <body>
   <a href="index.html" style="margin: 20px; padding: 10px 20px; font-size: 16px; display: inline-block; text-decoration: none; background: #444; color: white; border-radius: 6px;">&larr; Back</a>
@@ -32,8 +57,10 @@
     let panZoomInstance = null;
 
     function setupPanZoom() {
-      if (panZoomInstance) panZoomInstance.destroy();
-      panZoomInstance = svgPanZoom(mapObject.contentDocument.querySelector("svg"), {
+      const svg = mapObject.contentDocument?.querySelector("svg");
+      if (!svg) return;
+
+      panZoomInstance = svgPanZoom(svg, {
         zoomEnabled: true,
         controlIconsEnabled: true,
         fit: true,
@@ -47,6 +74,10 @@
 
     floorSelect.addEventListener("change", () => {
       const selected = floorSelect.value;
+      if (panZoomInstance) {
+        panZoomInstance.destroy();
+        panZoomInstance = null;
+      }
       mapObject.data = `maps/floor-${selected}.svg`;
     });
   </script>
