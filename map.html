@@ -5,33 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PRP Maps</title>
   <link rel="stylesheet" href="style.css" />
-  <style>
-    #map-container {
-      width: 100%;
-      max-width: 500px;
-      margin: 20px auto;
-      background: #fff;
-      border: 2px solid #ccc;
-      border-radius: 10px;
-      padding: 10px;
-    }
-
-    #map {
-      width: 100%;
-      height: auto;
-    }
-
-    select {
-      padding: 10px;
-      font-size: 16px;
-      margin-bottom: 20px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/svg-pan-zoom/3.6.1/svg-pan-zoom.min.js"></script>
 </head>
 <body>
-    <a href="index.html" style="margin: 20px; padding: 10px 20px; font-size: 16px; display: inline-block; text-decoration: none; background: #444; color: white; border-radius: 6px;">← Back</a>
+  <a href="index.html" style="margin: 20px; padding: 10px 20px; font-size: 16px; display: inline-block; text-decoration: none; background: #444; color: white; border-radius: 6px;">&larr; Back</a>
+
   <h2>Select a Floor</h2>
   <select id="floorSelect">
     <option value="G">Ground Floor</option>
@@ -44,17 +22,32 @@
     <option value="7">Floor 7</option>
   </select>
 
-  <div id="map-container">
-    <img id="map" src="maps/floor-G.svg" alt="PRP Floor Map" />
+  <div id="svg-pan-zoom-container">
+    <object id="map" type="image/svg+xml" data="maps/floor-G.svg"></object>
   </div>
 
   <script>
     const floorSelect = document.getElementById("floorSelect");
-    const mapImage = document.getElementById("map");
+    const mapObject = document.getElementById("map");
+    let panZoomInstance = null;
 
-    floorSelect.addEventListener("change", function () {
+    function setupPanZoom() {
+      if (panZoomInstance) panZoomInstance.destroy();
+      panZoomInstance = svgPanZoom(mapObject.contentDocument.querySelector("svg"), {
+        zoomEnabled: true,
+        controlIconsEnabled: true,
+        fit: true,
+        center: true
+      });
+    }
+
+    mapObject.addEventListener("load", () => {
+      setupPanZoom();
+    });
+
+    floorSelect.addEventListener("change", () => {
       const selected = floorSelect.value;
-      mapImage.src = `maps/floor-${selected}.svg`;
+      mapObject.data = `maps/floor-${selected}.svg`;
     });
   </script>
 </body>

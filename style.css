@@ -27,3 +27,14 @@ header {
 .button:hover {
   background-color: #555555;
 }
+
+/* Added zoom container styling */
+#svg-pan-zoom-container {
+  width: 100%;
+  max-width: 500px;
+  height: 500px;
+  margin: 20px auto;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #1e1e1e;
+}
