@@ -30,6 +30,18 @@
       border-radius: 6px;
       border: 1px solid #ccc;
     }
+
+    h2 {
+      color: white;
+      text-align: center;
+    }
+
+    body {
+      background-color: #121212;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -64,7 +76,9 @@
         zoomEnabled: true,
         controlIconsEnabled: true,
         fit: true,
-        center: true
+        center: true,
+        minZoom: 0.5,
+        maxZoom: 10
       });
     }
 
@@ -78,6 +92,8 @@
         panZoomInstance.destroy();
         panZoomInstance = null;
       }
+
+      // Update SVG and wait for it to load before setting up panZoom again
       mapObject.data = `maps/floor-${selected}.svg`;
     });
   </script>
