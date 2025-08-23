@@ -7,7 +7,7 @@ const FILES_TO_CACHE = [
   "icons/icon-192.png",
   "icons/icon-512.png",
   // Precache all floor SVGs
-  "maps/floor-g.svg",
+  "maps/floor-G.svg",
   "maps/floor-1.svg",
   "maps/floor-2.svg",
   "maps/floor-3.svg",

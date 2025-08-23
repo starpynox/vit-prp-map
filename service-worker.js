@@ -12,7 +12,7 @@ const PRECACHE = [
   'icons/icon-512x512.png',
 
   // Maps (lowercase g)
-  'maps/floor-g.svg',
+  'maps/floor-G.svg',
   'maps/floor-1.svg',
   'maps/floor-2.svg',
   'maps/floor-3.svg',
