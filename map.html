@@ -4,6 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PRP Map Viewer</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#3A86FF" />
+  <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+  <link rel="icon" href="icons/icon-192x192.png" type="image/png">
+
   <link rel="stylesheet" href="style.css" />
 </head>
 <body class="dark">
@@ -13,23 +20,42 @@
     </button>
     <div class="content-row">
       <div class="svg-viewport">
-        <object id="floor-map" type="image/svg+xml" data="maps/floor-G.svg"></object>
+        <!-- default is lowercase g -->
+        <object id="floor-map" type="image/svg+xml" data="maps/floor-g.svg">
+          <p>Floor map could not be loaded. Please try again.</p>
+        </object>
       </div>
       <div class="floor-buttons">
-        <button onclick="setFloor('G')">G</button>
-        <button onclick="setFloor('1')">1</button>
-        <button onclick="setFloor('2')">2</button>
-        <button onclick="setFloor('3')">3</button>
-        <button onclick="setFloor('4')">4</button>
-        <button onclick="setFloor('5')">5</button>
-        <button onclick="setFloor('6')">6</button>
-        <button onclick="setFloor('7')">7</button>
+        <button onclick="setFloor('g', event)">G</button>
+        <button onclick="setFloor('1', event)">1</button>
+        <button onclick="setFloor('2', event)">2</button>
+        <button onclick="setFloor('3', event)">3</button>
+        <button onclick="setFloor('4', event)">4</button>
+        <button onclick="setFloor('5', event)">5</button>
+        <button onclick="setFloor('6', event)">6</button>
+        <button onclick="setFloor('7', event)">7</button>
       </div>
     </div>
   </div>
   <script>
-    function setFloor(floor) {
-      document.getElementById("floor-map").setAttribute("data", `maps/floor-${floor}.svg`);
+    function setFloor(floor, event) {
+      document.getElementById("floor-map")
+        .setAttribute("data", `maps/floor-${floor}.svg`);
+      document.querySelectorAll(".floor-buttons button")
+        .forEach(btn => btn.classList.remove("active"));
+      if (event && event.target) event.target.classList.add("active");
+    }
+    window.addEventListener('load', () => {
+      const first = document.querySelector(".floor-buttons button");
+      if (first) first.classList.add("active");
+    });
+
+    // ensure SW is registered even if user lands here directly
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js')
+          .catch(console.error);
+      });
     }
   </script>
 </body>

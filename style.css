@@ -148,13 +148,22 @@ footer {
   font-size: 1.1rem;
   font-weight: 700;
   cursor: pointer;
-  transition: background 0.2s, border 0.2s;
+  transition: background 0.2s, border 0.2s, box-shadow .2s, transform .02s;
   outline: none;
 }
 .floor-buttons button:hover,
 .floor-buttons button:focus {
   background: #363b43;
   border-color: #888;
+}
+
+/* ✅ Active/highlighted floor button */
+.floor-buttons button.active {
+  background: #3A86FF;
+  border-color: #3A86FF;
+  color: #fff;
+  box-shadow: 0 0 0 4px rgba(58,134,255,0.25);
+  transform: translateY(-1px);
 }
 
 /* Responsive Design */
