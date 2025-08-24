@@ -1,17 +1,11 @@
-const CACHE_NAME = 'prp-cache-v2';
-
+const CACHE_NAME = 'prp-cache-v4';
 const PRECACHE = [
-  // App shell
   'index.html',
   'map.html',
   'style.css',
   'manifest.webmanifest',
-
-  // Icons
   'icons/icon-192x192.png',
   'icons/icon-512x512.png',
-
-  // Maps
   'maps/floor-G.svg',
   'maps/floor-1.svg',
   'maps/floor-2.svg',
@@ -22,39 +16,38 @@ const PRECACHE = [
   'maps/floor-7.svg'
 ];
 
-self.addEventListener('install', (event) => {
+// Install: cache all assets
+self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE))
+    caches.open(CACHE_NAME).then(cache => cache.addAll(PRECACHE))
   );
   self.skipWaiting();
 });
 
-self.addEventListener('activate', (event) => {
+// Activate: remove old caches
+self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(
-        keys.map(k => (k === CACHE_NAME ? null : caches.delete(k)))
-      )
+      Promise.all(keys.map(k => (k === CACHE_NAME ? null : caches.delete(k))))
     )
   );
   self.clients.claim();
 });
 
-self.addEventListener('fetch', (event) => {
-  // Special case for navigation (HTML pages)
+// Fetch: handle navigation + asset caching
+self.addEventListener('fetch', event => {
   if (event.request.mode === 'navigate') {
+    // Always respond with the cached HTML for navigation
     event.respondWith(
-      caches.match('index.html').then((cached) => {
-        return cached || fetch(event.request);
+      caches.match(event.request).then(cached => {
+        return cached || fetch(event.request).catch(() => caches.match('index.html'));
       })
     );
     return;
   }
 
-  // Cache-first for all other requests
+  // Cache-first for other requests
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      return cached || fetch(event.request);
-    })
+    caches.match(event.request).then(cached => cached || fetch(event.request))
   );
 });
