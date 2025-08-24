@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prp-cache-v1';
+const CACHE_NAME = 'prp-cache-v2';
 
 const PRECACHE = [
   // App shell
@@ -11,7 +11,7 @@ const PRECACHE = [
   'icons/icon-192x192.png',
   'icons/icon-512x512.png',
 
-  // Maps (lowercase g)
+  // Maps
   'maps/floor-G.svg',
   'maps/floor-1.svg',
   'maps/floor-2.svg',
@@ -32,14 +32,26 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.map(k => (k === CACHE_NAME ? null : caches.delete(k))))
+      Promise.all(
+        keys.map(k => (k === CACHE_NAME ? null : caches.delete(k)))
+      )
     )
   );
   self.clients.claim();
 });
 
 self.addEventListener('fetch', (event) => {
-  // Cache-first for everything (simple + fully offline)
+  // Special case for navigation (HTML pages)
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      caches.match('index.html').then((cached) => {
+        return cached || fetch(event.request);
+      })
+    );
+    return;
+  }
+
+  // Cache-first for all other requests
   event.respondWith(
     caches.match(event.request).then((cached) => {
       return cached || fetch(event.request);
